@@ -2,5 +2,5 @@
 
 sudo yum -y install httpd
 sudo cp jenkins.conf /etc/httpd/conf.d
-service httpd restart
-chkconfig httpd on
+sudo service httpd restart
+sudo chkconfig httpd on
