@@ -1,0 +1,26 @@
+{
+    "category": "Build", 
+    "provider": "Jenkins", 
+    "version": "2", 
+    "settings": {
+        "entityUrlTemplate": "http://ec2-54-152-95-85.compute-1.amazonaws.com/job/{Config:ProjectName}", 
+        "executionUrlTemplate": "http://ec2-54-152-95-85.compute-1.amazonaws.com/job/{Config:ProjectName}/{ExternalExecutionId}"
+    }, 
+    "configurationProperties": [
+        {
+            "name": "ProjectName", 
+            "required": true, 
+            "key": true, 
+            "secret": false, 
+            "queryable": true
+        }
+    ], 
+    "inputArtifactDetails": {
+        "minimumCount": 0, 
+        "maximumCount": 5
+    }, 
+    "outputArtifactDetails": {
+        "minimumCount": 0, 
+        "maximumCount": 5
+    }
+}
