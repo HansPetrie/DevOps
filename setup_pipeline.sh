@@ -1,6 +1,6 @@
 HOSTNAME=$(curl -s 169.254.169.254/latest/meta-data/public-hostname/)
 echo $HOSTNAME
-VERSION=$(date +%y%m%d)
+VERSION=$(date +%y%m%d%H%M)
 echo $VERSION
 
 sed "s|JENKINS_SERVER|$HOSTNAME|g" custom_action_type.json > /tmp/custom_action_type.json
