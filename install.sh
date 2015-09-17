@@ -5,3 +5,4 @@
 ./jenkins.sh
 ./jenkins_proxy.sh
 ./jenkins_config.sh
+./setup_pipeline.sh
