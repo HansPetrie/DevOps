@@ -9,7 +9,7 @@
     <projectName>MyDemoProject</projectName>
     <actionTypeCategory>Build</actionTypeCategory>
     <actionTypeProvider>Jenkins</actionTypeProvider>
-    <actionTypeVersion>1</actionTypeVersion>
+    <actionTypeVersion>VERSION_STRING</actionTypeVersion>
     <region>us-east-1</region>
     <awsAccessKey></awsAccessKey>
     <awsSecretKey></awsSecretKey>
