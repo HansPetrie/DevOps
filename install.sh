@@ -4,3 +4,4 @@
 ./setup_git.sh
 ./jenkins.sh
 ./jenkins_proxy.sh
+./jenkins_config.sh
