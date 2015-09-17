@@ -1,6 +1,6 @@
 {
     "category": "Build", 
-    "provider": "JenkinsProvider", 
+    "provider": "Jenkins", 
     "version": "VERSION_STRING", 
     "settings": {
         "entityUrlTemplate": "http://JENKINS_SERVER/job/{Config:ProjectName}", 

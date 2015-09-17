@@ -41,7 +41,7 @@
                             "category": "Build",
                             "owner": "Custom",
                             "version": "VERSION_STRING",
-                            "provider": "JenkinsProvider"
+                            "provider": "Jenkins"
                         },
                         "outputArtifacts": [
                             {
