@@ -1,10 +1,10 @@
 {
     "category": "Build", 
-    "provider": "Jenkins", 
-    "version": "2", 
+    "provider": "JenkinsProvider", 
+    "version": "VERSION_STRING", 
     "settings": {
-        "entityUrlTemplate": "http://ec2-54-152-95-85.compute-1.amazonaws.com/job/{Config:ProjectName}", 
-        "executionUrlTemplate": "http://ec2-54-152-95-85.compute-1.amazonaws.com/job/{Config:ProjectName}/{ExternalExecutionId}"
+        "entityUrlTemplate": "http://JENKINS_SERVER/job/{Config:ProjectName}", 
+        "executionUrlTemplate": "http://JENKINS_SERVER/job/{Config:ProjectName}/{ExternalExecutionId}"
     }, 
     "configurationProperties": [
         {

@@ -40,7 +40,7 @@
                         "actionTypeId": {
                             "category": "Build",
                             "owner": "Custom",
-                            "version": "1",
+                            "version": "VERSION_STRING",
                             "provider": "JenkinsProvider"
                         },
                         "outputArtifacts": [
@@ -61,6 +61,6 @@
             "location": "codepipeline-us-east-1-49909909306"
         }, 
         "name": "JenkinsDemoCLI", 
-        "version": 2
+        "version": 1
     }
 }
