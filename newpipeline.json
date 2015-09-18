@@ -1,6 +1,6 @@
 {
     "pipeline": {
-        "roleArn": "arn:aws:iam::665347073193:role/AWS-CodePipeline-Service", 
+        "roleArn": "ROLEARN", 
         "stages": [
             {
                 "name": "Source",
