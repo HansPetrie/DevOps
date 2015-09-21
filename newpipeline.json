@@ -20,8 +20,8 @@
                             }
                         ],
                         "configuration": {
-                            "S3Bucket": "aws-hans-codedeploy-1234",
-                            "S3ObjectKey": "aws-codepipeline-s3-aws-codedeploy_linux.zip"
+                            "S3Bucket": "DEVOPSBUCKET",
+                            "S3ObjectKey": "test.zip"
                         },
                         "runOrder": 1
                     }
@@ -58,9 +58,9 @@
         ], 
         "artifactStore": {
             "type": "S3", 
-            "location": "codepipeline-us-east-1-49909909306"
+            "location": "DEVOPSBUCKET"
         }, 
-        "name": "JenkinsDemoCLI", 
+        "name": "JenkinsDemo", 
         "version": 1
     }
 }

@@ -20,5 +20,6 @@ aws --region us-east-1 codepipeline create-custom-action-type --cli-input-json f
 
 sed "s|VERSION_STRING|$VersionString|g" newpipeline.json > /tmp/newpipeline.json
 sed -i "s|ROLEARN|$CodePipelineRoleArn|g" /tmp/newpipeline.json
+sed -i "s|DEVOPSBUCKET|$DevopsBucketName" /tmp/newpipeline.json
 
 aws --region us-east-1 codepipeline create-pipeline --cli-input-json file:///tmp/newpipeline.json
