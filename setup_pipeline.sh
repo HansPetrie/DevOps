@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source devops.conf
+source devops.cnf
 
 # Sleep allows Jenkins time to start up and extract itself
 sleep 30 
