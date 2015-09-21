@@ -1,5 +1,6 @@
 #!/bin/bash
 
+./get_envs.sh
 ./setup_repo.sh
 ./setup_git.sh
 ./jenkins.sh
