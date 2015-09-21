@@ -1,6 +1,9 @@
+#!/bin/bash
+
+source /tmp/devops.conf
+
 HOSTNAME=$(curl -s 169.254.169.254/latest/meta-data/public-hostname/)
 VERSION=$(date +%m%d%H%M)
-PIPELINEARN=$(aws --region us-east-1 cloudformation describe-stacks --stack-name $(cat stackname) --output text --query 'Stacks[*].Outputs[?OutputKey==`CodePipelineRoleArn`]'.OutputValue)
 
 # Sleep allows Jenkins time to start up and extract itself
 sleep 30 
@@ -19,6 +22,6 @@ sed -i "s|VERSION_STRING|$VERSION|g" /tmp/custom_action_type.json
 aws --region us-east-1 codepipeline create-custom-action-type --cli-input-json file:///tmp/custom_action_type.json
 
 sed "s|VERSION_STRING|$VERSION|g" newpipeline.json > /tmp/newpipeline.json
-sed -i "s|ROLEARN|$PIPELINEARN|g" /tmp/newpipeline.json
+sed -i "s|ROLEARN|$CodePipelineRoleArn|g" /tmp/newpipeline.json
 
 aws --region us-east-1 codepipeline create-pipeline --cli-input-json file:///tmp/newpipeline.json
