@@ -4,9 +4,9 @@ source /DevOps/devops.cnf
 
 aws --region us-east-1 deploy create-application --application-name WordPress_App
 
-wget -q -O /tmp https://s3-us-west-2.amazonaws.com/publicrandomstuff/WordPress.zip
+wget -q -O /tmp/WordPress.zip https://s3-us-west-2.amazonaws.com/publicrandomstuff/WordPress.zip
 
-unzip /tmp/WordPress.zip
+unzip -q /tmp/WordPress.zip -d /tmp 
 
 cd /tmp/WordPress
 
