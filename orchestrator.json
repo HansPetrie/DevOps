@@ -7,11 +7,6 @@
       "Type": "AWS::EC2::KeyPair::KeyName",
       "ConstraintDescription": "Can contain only ASCII characters."
     },
-    "BootstrapCommand": {
-      "Description": "A bootstrap command to run",
-      "Type": "String",
-      "Default":"wget https://s3-us-west-2.amazonaws.com/publicrandomstuff/DevOps.zip;unzip DevOps"
-    },
     "SSHLocation": {
       "Description": "The IP address range that can be used to SSH to the EC2 instances",
       "Type": "String",
@@ -276,10 +271,7 @@
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                {
-                  "Ref": "BootstrapCommand"
-                },
-                "\n",
+		"git clone https://github.com/HansPetrie/DevOps.git\n",
                 "cd DevOps\n",
                 "echo CloudformationStackName=",
                 {
