@@ -60,7 +60,7 @@
             "type": "S3", 
             "location": "DEVOPSBUCKET"
         }, 
-        "name": "JenkinsDemo", 
+        "name": "CODEPIPELINENAME", 
         "version": 1
     }
 }
