@@ -3,7 +3,7 @@
 source devops.cnf
 
 # Sleep allows Jenkins time to start up and extract itself
-sleep 10 
+sleep 30 
 
 sed "s|JENKINS_SERVER|$JenkinsHostname|g" custom_action_type.json > /tmp/custom_action_type.json
 sed -i "s|VERSION_STRING|$VersionString|g" /tmp/custom_action_type.json
@@ -18,18 +18,6 @@ sed -i "s|CODEPIPELINENAME|$CodePipelineName|g" /tmp/newpipeline.json
 aws --region us-east-1 codepipeline get-pipeline --name $CodePipelineName && aws --region us-east-1 codepipeline delete-pipeline --name $CodePipelineName
 
 aws --region us-east-1 codepipeline create-pipeline --cli-input-json file:///tmp/newpipeline.json
-
-
-sed "s|VERSION_STRING|$VersionString|g" wordpresspipeline.json > /tmp/wordpresspipeline.json
-sed -i "s|ROLEARN|$CodePipelineRoleArn|g" /tmp/wordpresspipeline.json
-sed -i "s|DEVOPSBUCKET|$DevopsBucketName|g" /tmp/wordpresspipeline.json
-sed -i "s|CODEPIPELINENAME|WordPressPipeline|g" /tmp/wordpresspipeline.json
-
-#If the pipeline already exists delete it and re-create it with the updated custom_action_type
-aws --region us-east-1 codepipeline get-pipeline --name WordPressPipeline && aws --region us-east-1 codepipeline delete-pipeline --name WordPressPipeline 
-
-aws --region us-east-1 codepipeline create-pipeline --cli-input-json file:///tmp/wordpresspipeline.json
-
 
 wget -q -O /var/lib/jenkins/plugins/aws-codepipeline-for-jenkins.hpi https://s3-us-west-2.amazonaws.com/publicrandomstuff/aws-codepipeline-for-jenkins.hpi
 mkdir -p /var/lib/jenkins/jobs/MyDemoProject
