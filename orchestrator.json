@@ -20,10 +20,21 @@
       "Description": "The name of the S3 bucket for code.",
       "Type": "String",
       "Default": "Hans-CodePipeline-Bucket-Test"
+    },
+    "CodePipelineName": {
+      "Description": "The name of the new CodePipeline that will be created.",
+      "Type": "String",
+      "Default": "JenkinsDemo"
+    }
+  },
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : { "64": "ami-0d4cfd66"},
+      "us-west-2" : { "64": "ami-9ff7e8af"}
     }
   },
   "Resources": {
-     "CodeDeployTrustRole": {
+    "CodeDeployTrustRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -238,7 +249,7 @@
         }
       },
       "Properties": {
-        "ImageId": "ami-0d4cfd66",
+        "ImageId": { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "64"]},
         "InstanceType": "t2.micro",
         "SecurityGroups": [
           {
@@ -271,13 +282,18 @@
                   "Ref": "AWS::Region"
                 },
                 "\n",
-		"git clone https://github.com/HansPetrie/DevOps.git\n",
+                "git clone https://github.com/HansPetrie/DevOps.git\n",
                 "cd DevOps\n",
-                "echo CloudformationStackName=",
+                "echo -e 'CloudformationStackName=\"",
                 {
                   "Ref": "AWS::StackName"
                 },
-                " > devops.cnf\n",
+                "\"' > devops.cnf\n",
+                "echo -e 'CloudformationRegion=\"",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\"' >> devops.cnf\n",
                 "./install.sh\n"
               ]
             ]
@@ -332,7 +348,7 @@
       "Description": "The role resource name for CodePipeline",
       "Value": {
         "Fn::GetAtt": [
-          "CodeDeployRolePolicies",
+          "CodeDeployTrustRole",
           "Arn"
         ]
       }
