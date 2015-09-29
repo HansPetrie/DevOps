@@ -1,6 +1,6 @@
 {
     "pipeline": {
-        "roleArn": "ROLEARN", 
+        "roleArn": "<%= @CodeDeployRoleArn %>", 
         "stages": [
             {
                 "name": "Source",
@@ -20,7 +20,7 @@
                             }
                         ],
                         "configuration": {
-                            "S3Bucket": "DEVOPSBUCKET",
+                            "S3Bucket": "<%= @DevopsBucketName %>",
                             "S3ObjectKey": "wordpressapp.zip"
                         },
                         "runOrder": 1
@@ -55,9 +55,10 @@
         ], 
         "artifactStore": {
             "type": "S3", 
-            "location": "DEVOPSBUCKET"
+            "location": "<%= @DevopsBucketName %>"
         }, 
         "name": "WordPressPipeline", 
         "version": 1
     }
 }
+

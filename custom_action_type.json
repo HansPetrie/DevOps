@@ -1,10 +1,10 @@
 {
     "category": "Build", 
     "provider": "Jenkins", 
-    "version": "VERSION_STRING", 
+    "version": "<%= @VersionString %>", 
     "settings": {
-        "entityUrlTemplate": "http://JENKINS_SERVER/job/{Config:ProjectName}", 
-        "executionUrlTemplate": "http://JENKINS_SERVER/job/{Config:ProjectName}/{ExternalExecutionId}"
+        "entityUrlTemplate": "http://<%= @JenkinsHostname %>/job/{Config:ProjectName}", 
+        "executionUrlTemplate": "http://<%= @JenkinsHostname %>/job/{Config:ProjectName}/{ExternalExecutionId}"
     }, 
     "configurationProperties": [
         {

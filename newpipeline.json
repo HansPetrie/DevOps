@@ -1,6 +1,6 @@
 {
     "pipeline": {
-        "roleArn": "ROLEARN", 
+        "roleArn": "<%= @CodePipelineRoleArn %>", 
         "stages": [
             {
                 "name": "Source",
@@ -20,7 +20,7 @@
                             }
                         ],
                         "configuration": {
-                            "S3Bucket": "DEVOPSBUCKET",
+                            "S3Bucket": "<%= @DevopsBucketName %>",
                             "S3ObjectKey": "test.zip"
                         },
                         "runOrder": 1
@@ -40,7 +40,7 @@
                         "actionTypeId": {
                             "category": "Build",
                             "owner": "Custom",
-                            "version": "VERSION_STRING",
+                            "version": "<%= @VersionString %>",
                             "provider": "Jenkins"
                         },
                         "outputArtifacts": [
@@ -58,9 +58,10 @@
         ], 
         "artifactStore": {
             "type": "S3", 
-            "location": "DEVOPSBUCKET"
+            "location": "<%= @DevopsBucketName %>"
         }, 
-        "name": "CODEPIPELINENAME", 
+        "name": "<%= @CodePipelineName %>", 
         "version": 1
     }
 }
+
