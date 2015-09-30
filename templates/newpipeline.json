@@ -21,7 +21,7 @@
                         ],
                         "configuration": {
                             "S3Bucket": "<%= @DevopsBucketName %>",
-                            "S3ObjectKey": "test.zip"
+                            "S3ObjectKey": "wordpressapp.zip"
                         },
                         "runOrder": 1
                     }

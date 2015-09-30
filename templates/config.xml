@@ -31,7 +31,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>aws s3 cp s3://<%= @DevopsBucketName %>/test.zip .
-unzip test.zip
+unzip -o test.zip
 bash test.sh
       </command>
     </hudson.tasks.Shell>
