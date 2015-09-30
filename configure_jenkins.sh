@@ -11,12 +11,8 @@ do
 done
 
 java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 install-plugin /tmp/aws-codepipeline-for-jenkins.hpi
-
-erb -r './devops.rb' config.xml > /tmp/config.xml
-erb -r './devops.rb' deploy_lamp_jenkins_job.xml > /tmp/deploy_lamp_jenkins_job.xml
-
-java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job MyDemoProject < /tmp/config.xml
-java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job DeployLampServer < /tmp/deploy_lamp_jenkins_job.xml
+java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job MyDemoProject < rendered_templates/config.xml
+java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job DeployLampServer < rendered_templates/deploy_lamp_jenkins_job.xml
 
 # A restart is inevitable here because the AWS CodePipeline Plugin install doesn't work until Jenkins is restarted
 service jenkins restart

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ./get_envs.sh
+./render_templates.sh
 ./setup_repo.sh
 ./setup_git.sh
 ./jenkins.sh
