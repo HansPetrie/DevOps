@@ -30,7 +30,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command> s3 cp s3://<%= @DevopsBucketName %>/test.zip .
+      <command>aws s3 cp s3://<%= @DevopsBucketName %>/test.zip .
 unzip test.zip
 bash test.sh
       </command>
