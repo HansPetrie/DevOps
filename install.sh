@@ -7,7 +7,7 @@
 ./jenkins.sh
 ./jenkins_proxy.sh
 ./configure_jenkins.sh
+./setup_code_deploy.sh
 ./setup_bucket.sh
 ./setup_pipeline.sh
 ./code_deploy_agent.sh
-./setup_code_deploy.sh

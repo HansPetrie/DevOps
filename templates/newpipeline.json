@@ -68,7 +68,7 @@
                         "actionTypeId": {
                             "category": "Deploy", 
                             "owner": "AWS", 
-                            "version": "<%= @VersionString %>", 
+                            "version": "1", 
                             "provider": "CodeDeploy"
                         }, 
                         "outputArtifacts": [], 
