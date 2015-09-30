@@ -54,6 +54,31 @@
                         "runOrder": 2
                     }
                 ]
+            },
+	    {
+                "name": "Deploy", 
+                "actions": [
+                    {
+                        "inputArtifacts": [
+                            {
+                                "name": "MyApp"
+                            }
+                        ], 
+                        "name": "DeployWordpress", 
+                        "actionTypeId": {
+                            "category": "Deploy", 
+                            "owner": "AWS", 
+                            "version": "<%= @VersionString %>", 
+                            "provider": "CodeDeploy"
+                        }, 
+                        "outputArtifacts": [], 
+                        "configuration": {
+                            "ApplicationName": "wordpress_app", 
+                            "DeploymentGroupName": "wordpress_depgroup"
+                        }, 
+                        "runOrder": 1
+                    }
+                ]
             }
         ], 
         "artifactStore": {
@@ -64,4 +89,3 @@
         "version": 1
     }
 }
-
