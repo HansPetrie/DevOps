@@ -1,0 +1,49 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Setup MultiAZ RDS Instance",
+  "Resources": {
+    "RDSDBinstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "MultiAZ": "true",
+        "DBSecurityGroups": [
+          {
+            "Ref": "RDSSecurityGroup"
+          }
+        ],
+        "AllocatedStorage": "5",
+        "DBInstanceClass": "db.m1.small",
+        "Engine": "MySQL",
+        "MasterUsername": "root",
+        "MasterUserPassword": "password",
+        "DBSubnetGroupName": {
+          "Ref": "RDSDBSubnetGroup"
+        },
+        "DBName": "wordpress"
+      },
+      "DeletionPolicy": "Snapshot"
+    },
+    "RDSDBSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "description",
+        "SubnetIds": [
+          "subnet-0b38646e",
+          "subnet-e4c4b793"
+        ]
+      }
+    },
+    "RDSSecurityGroup": {
+      "Type": "AWS::RDS::DBSecurityGroup",
+      "Properties": {
+        "EC2VpcId": "vpc-00793665",
+        "GroupDescription": "Allow WebServer SecurityGroup access to RDS DB",
+        "DBSecurityGroupIngress": [
+          {
+            "EC2SecurityGroupId": "sg-a978e4cd"
+          }
+        ]
+      }
+    }
+  }
+}
