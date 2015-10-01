@@ -1,0 +1,89 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Sets up a Production VPC and 2 public and 2 private subnets with VPC",
+  "Resources": {
+    "VPCProduction": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.1.0.0/16",
+        "EnableDnsSupport": "false",
+        "EnableDnsHostnames": "false",
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ProductionVPC"
+          }
+        ]
+      }
+    },
+    "SUBPublicWest2a": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-west-2a",
+        "CidrBlock": "10.1.1.0/24",
+        "MapPublicIpOnLaunch": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SUBPublicWest2a"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPCProduction"
+        }
+      }
+    },
+    "SUBPublicWest2b": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-west-2b",
+        "CidrBlock": "10.1.2.0/24",
+        "MapPublicIpOnLaunch": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SUBPublicWest2b"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPCProduction"
+        }
+      }
+    },
+    "SUBPrivateWest2a": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-west-2a",
+        "CidrBlock": "10.1.3.0/24",
+        "MapPublicIpOnLaunch": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SUBPrivateWest2a"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPCProduction"
+        }
+      }
+    },
+    "SUBPrivateWest2b": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "us-west-2b",
+        "CidrBlock": "10.1.4.0/24",
+        "MapPublicIpOnLaunch": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SUBPrivateWest2b"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPCProduction"
+        }
+      }
+    }
+  }
+}
