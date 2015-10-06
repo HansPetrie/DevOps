@@ -2,6 +2,13 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Setup MultiAZ RDS Instance",
   "Resources": {
+    "NetworkStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3-us-west-2.amazonaws.com/publicrandomstuff/network.json",
+        "TimeoutInMinutes": "60"
+      }
+    },
     "RDSDBinstance": {
       "Type": "AWS::RDS::DBInstance",
       "Properties": {
@@ -12,7 +19,7 @@
           }
         ],
         "AllocatedStorage": "5",
-        "DBInstanceClass": "db.m1.small",
+        "DBInstanceClass": "db.m3.medium",
         "Engine": "MySQL",
         "MasterUsername": "root",
         "MasterUserPassword": "password",
@@ -28,22 +35,41 @@
       "Properties": {
         "DBSubnetGroupDescription": "description",
         "SubnetIds": [
-          "subnet-0b38646e",
-          "subnet-e4c4b793"
+          {
+            "Fn::GetAtt": [
+              "NetworkStack",
+              "Outputs.PrivateSubnetID1"
+            ]
+          },
+          {
+            "Fn::GetAtt": [
+              "NetworkStack",
+              "Outputs.PrivateSubnetID2"
+            ]
+          }
         ]
       }
     },
     "RDSSecurityGroup": {
       "Type": "AWS::RDS::DBSecurityGroup",
       "Properties": {
-        "EC2VpcId": "vpc-00793665",
-        "GroupDescription": "Allow WebServer SecurityGroup access to RDS DB",
+        "EC2VpcId": {
+          "Fn::GetAtt": [
+            "NetworkStack",
+            "Outputs.VPCID"
+          ]
+        },
+        "GroupDescription": "Allow RDSAccess SecurityGroup access to RDS DB",
         "DBSecurityGroupIngress": [
           {
-            "EC2SecurityGroupId": "sg-a978e4cd"
+            "EC2SecurityGroupId": {
+              "Fn::GetAtt": [
+                "NetworkStack",
+                "Outputs.SGRDSAccess"
+              ]
+            }
           }
         ]
       }
     }
   }
-}
