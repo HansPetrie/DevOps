@@ -4,27 +4,27 @@
   "Outputs": {
     "VPCID": {
       "Value": {
-        "Ref": "VPCProduction"
+        "Ref": "VPC"
       }
     },
-    "PublicSubnetID1": {
+    "PublicSubnet1ID": {
       "Value": {
-        "Ref": "SUBPublicWest2a"
+        "Ref": "PublicSubnet1"
       }
     },
-    "PublicSubnetID2": {
+    "PublicSubnet2ID": {
       "Value": {
-        "Ref": "SUBPublicWest2b"
+        "Ref": "PublicSubnet2"
       }
     },
-    "PrivateSubnetID1": {
+    "PrivateSubnet1ID": {
       "Value": {
-        "Ref": "SUBPrivateWest2a"
+        "Ref": "PrivateSubnet1"
       }
     },
-    "PrivateSubnetID2": {
+    "PrivateSubnet2ID": {
       "Value": {
-        "Ref": "SUBPrivateWest2b"
+        "Ref": "PrivateSubnet2"
       }
     },
     "SGRDSAccess": {
@@ -34,12 +34,12 @@
     }
   },
   "Resources": {
-    "VPCProduction": {
+    "VPC": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
         "CidrBlock": "10.1.0.0/16",
-        "EnableDnsSupport": "false",
-        "EnableDnsHostnames": "false",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
         "InstanceTenancy": "default",
         "Tags": [
           {
@@ -49,11 +49,11 @@
         ]
       }
     },
-    "SUBPublicWest2a": {
+    "PublicSubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "AvailabilityZone": "us-west-2a",
-        "CidrBlock": "10.1.1.0/24",
+        "CidrBlock": "10.1.0.0/20",
         "MapPublicIpOnLaunch": "true",
         "Tags": [
           {
@@ -62,15 +62,15 @@
           }
         ],
         "VpcId": {
-          "Ref": "VPCProduction"
+          "Ref": "VPC"
         }
       }
     },
-    "SUBPublicWest2b": {
+    "PublicSubnet2": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "AvailabilityZone": "us-west-2b",
-        "CidrBlock": "10.1.2.0/24",
+        "CidrBlock": "10.1.16.0/20",
         "MapPublicIpOnLaunch": "true",
         "Tags": [
           {
@@ -79,15 +79,15 @@
           }
         ],
         "VpcId": {
-          "Ref": "VPCProduction"
+          "Ref": "VPC"
         }
       }
     },
-    "SUBPrivateWest2a": {
+    "PrivateSubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "AvailabilityZone": "us-west-2a",
-        "CidrBlock": "10.1.5.0/24",
+        "CidrBlock": "10.1.32.0/20",
         "MapPublicIpOnLaunch": "false",
         "Tags": [
           {
@@ -96,15 +96,15 @@
           }
         ],
         "VpcId": {
-          "Ref": "VPCProduction"
+          "Ref": "VPC"
         }
       }
     },
-    "SUBPrivateWest2b": {
+    "PrivateSubnet2": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "AvailabilityZone": "us-west-2b",
-        "CidrBlock": "10.1.4.0/24",
+        "CidrBlock": "10.1.48.0/20",
         "MapPublicIpOnLaunch": "false",
         "Tags": [
           {
@@ -113,7 +113,98 @@
           }
         ],
         "VpcId": {
-          "Ref": "VPCProduction"
+          "Ref": "VPC"
+        }
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "VPCGatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ProductionPublicRouteTable"
+          }
+        ]
+      }
+    },
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "VPCGatewayAttachment",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicSubnet1RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnet1NetworkAclAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "NetworkAclId": {
+          "Fn::GetAtt": [
+            "VPC",
+            "DefaultNetworkAcl"
+          ]
+        }
+      }
+    },
+    "PublicSubnet2RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet2"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnet2NetworkAclAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet2"
+        },
+        "NetworkAclId": {
+          "Fn::GetAtt": [
+            "VPC",
+            "DefaultNetworkAcl"
+          ]
         }
       }
     },
@@ -122,7 +213,7 @@
       "Properties": {
         "GroupDescription": "Security group to allow RDS Access",
         "VpcId": {
-          "Ref": "VPCProduction"
+          "Ref": "VPC"
         }
       }
     }
