@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STACKNAME=Network$(date +%Y%m%d%H%M%S)
+STACKNAME=ProductionNetwork
 
 aws --region us-west-2 cloudformation create-stack --stack-name $STACKNAME --template-body file://teststack.json --capabilities CAPABILITY_IAM 
 
