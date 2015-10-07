@@ -2,7 +2,7 @@
 
 STACKNAME=OpsworksTest
 
-aws --region us-east-1 cloudformation create-stack --stack-name $STACKNAME --template-body file://teststack.json --parameters ParameterKey=DBPassword,ParameterValue=password ParameterKey=DBRootPassword,ParameterValue=password ParameterKey=KeyName,ParameterValue=default ParameterKey=DBUser,ParameterValue=username --capabilities CAPABILITY_IAM 
+aws --region us-east-1 cloudformation create-stack --stack-name $STACKNAME --template-body file://teststack.json --parameters ParameterKey=MysqlRootPassword,ParameterValue=password --capabilities CAPABILITY_IAM 
 
 while [ `aws --region us-east-1 cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].[StackStatus]'` != "CREATE_COMPLETE" ]
 do
@@ -11,4 +11,3 @@ do
 done
 
 aws --region us-east-1 cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].Outputs[*].OutputValue'
-
