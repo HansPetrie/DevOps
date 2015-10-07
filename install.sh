@@ -7,6 +7,7 @@
 ./jenkins.sh
 ./jenkins_proxy.sh
 ./configure_jenkins.sh
+./rundeck.sh
 ./setup_code_deploy.sh
 ./setup_bucket.sh
 ./setup_pipeline.sh
