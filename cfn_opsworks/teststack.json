@@ -1,6 +1,20 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
+    "NetworkStackName": {
+      "Default": "ProductionNetwork",
+      "Description": "The name of the CFN stack to use as the VPC Network.  Note: this stack must already be deployed.",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBHostname": {
+      "Default": "rrhkxx551ycwz0.culovgr4qwyc.us-west-2.rds.amazonaws.com",
+      "Description": "The name of the database host or RDS endpoint.  Must already be deployed.",
+      "Type": "String"
+    },
     "ServiceRole": {
       "Default": "aws-opsworks-service-role",
       "Description": "The OpsWorks service role",
@@ -20,21 +34,143 @@
       "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
     },
     "AppName": {
-      "Default": "myapp",
+      "Default": "wordpress",
       "Description": "The app name",
       "Type": "String",
       "MinLength": "1",
       "MaxLength": "64",
       "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
       "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
-    },
-    "MysqlRootPassword" : {
-      "Description" : "MysqlRootPassword",
-      "NoEcho" : "true",
-      "Type" : "String"
+    }
+  },
+  "Outputs": {
+    "ELBDNSName": {
+      "Description": "The DNSName of the balancer",
+      "Value": {
+        "Fn::GetAtt": [
+          "ELB",
+          "DNSName"
+        ]
+      }
     }
   },
   "Resources": {
+    "NetworkInfo": {
+      "Type": "Custom::NetworkInfo",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "LookupStackOutputs",
+            "Arn"
+          ]
+        },
+        "StackName": {
+          "Ref": "NetworkStackName"
+        }
+      }
+    },
+    "LookupStackOutputs": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "var response = require('cfn-response');",
+                "exports.handler = function(event, context) {",
+                "    console.log('REQUEST RECEIVED:\\n', JSON.stringify(event));",
+                "    if (event.RequestType == 'Delete') {",
+                "        response.send(event, context, response.SUCCESS);",
+                "        return;",
+                "    }",
+                "    var stackName = event.ResourceProperties.StackName;",
+                "    var responseData = {};",
+                "    if (stackName) {",
+                "        var aws = require('aws-sdk');",
+                "        var cfn = new aws.CloudFormation();",
+                "        cfn.describeStacks({StackName: stackName}, function(err, data) {",
+                "            if (err) {",
+                "                responseData = {Error: 'DescribeStacks call failed'};",
+                "                console.log(responseData.Error + ':\\n', err);",
+                "                response.send(event, context, response.FAILED, responseData);",
+                "            }",
+                "            else {",
+                "                data.Stacks[0].Outputs.forEach(function(output) {",
+                "                    responseData[output.OutputKey] = output.OutputValue;",
+                "                });",
+                "                response.send(event, context, response.SUCCESS, responseData);",
+                "            }",
+                "        });",
+                "    } else {",
+                "        responseData = {Error: 'Stack name not specified'};",
+                "        console.log(responseData.Error);",
+                "        response.send(event, context, response.FAILED, responseData);",
+                "    }",
+                "};"
+              ]
+            ]
+          }
+        },
+        "Runtime": "nodejs",
+        "Timeout": "30"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "root",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cloudformation:DescribeStacks"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "myStack": {
       "Type": "AWS::OpsWorks::Stack",
       "Properties": {
@@ -43,77 +179,136 @@
         },
         "ServiceRoleArn": {
           "Fn::Join": [
-            "", ["arn:aws:iam::", {"Ref": "AWS::AccountId"},
-                  ":role/", {"Ref": "ServiceRole"}]
+            "",
+            [
+              "arn:aws:iam::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":role/",
+              {
+                "Ref": "ServiceRole"
+              }
+            ]
           ]
         },
         "DefaultInstanceProfileArn": {
           "Fn::Join": [
-            "", ["arn:aws:iam::", {"Ref": "AWS::AccountId"},
-              ":instance-profile/", {"Ref": "InstanceRole"}]
+            "",
+            [
+              "arn:aws:iam::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":instance-profile/",
+              {
+                "Ref": "InstanceRole"
+              }
+            ]
           ]
         },
         "UseCustomCookbooks": "true",
         "CustomCookbooksSource": {
           "Type": "git",
-          "Url": "git://github.com/amazonwebservices/opsworks-example-cookbooks.git"
-        }
+          "Url": "git://github.com/HansPetrie/chef-repo.git"
+        },
+        "CustomJson": {
+          "wordpress": {
+            "db_user": "root",
+            "db_password": "password",
+            "db_hostname": {
+              "Ref": "DBHostname"
+            },
+            "site_url": {
+              "Fn::GetAtt": [
+                "ELB",
+                "DNSName"
+              ]
+            }
+          }
+        },
+        "VpcId": {
+          "Fn::GetAtt": [
+            "NetworkInfo",
+            "VPCID"
+          ]
+        },
+        "DefaultSubnetId": {
+          "Fn::GetAtt": [
+            "NetworkInfo",
+            "PublicSubnet1ID"
+          ]
+        },
+        "DefaultSshKeyName": "uswest"
       }
-    },    
+    },
     "myLayer": {
       "Type": "AWS::OpsWorks::Layer",
       "DependsOn": "myApp",
       "Properties": {
-        "StackId": {"Ref": "myStack"},
+        "StackId": {
+          "Ref": "myStack"
+        },
         "Type": "php-app",
-	    "Shortname" : "php-app",
-        "EnableAutoHealing" : "true",
-        "AutoAssignElasticIps" : "false",
-        "AutoAssignPublicIps" : "true",
+        "Shortname": "php-app",
+        "EnableAutoHealing": "true",
+        "AutoAssignElasticIps": "false",
+        "AutoAssignPublicIps": "true",
         "Name": "MyPHPApp",
-        "CustomRecipes" : {
-          "Configure" : ["phpapp::appsetup"]
+        "CustomRecipes": {
+          "Configure": [
+            "phpapp::appsetup"
+          ],
+          "Deploy": [
+            "wordpress::default"
+          ]
         }
       }
     },
-    "DBLayer" : {
-      "Type" : "AWS::OpsWorks::Layer",
-      "DependsOn": "myApp",
-      "Properties" : {
-        "StackId" : {"Ref":"myStack"},
-        "Type" : "db-master",
-	    "Shortname" : "db-layer",
-        "EnableAutoHealing" : "true",
-        "AutoAssignElasticIps" : "false",
-        "AutoAssignPublicIps" : "true",
-        "Name" : "MyMySQL",
-        "CustomRecipes" : {
-          "Setup" : ["phpapp::dbsetup"]
+    "ELBAttachment": {
+      "Type": "AWS::OpsWorks::ElasticLoadBalancerAttachment",
+      "Properties": {
+        "ElasticLoadBalancerName": {
+          "Ref": "ELB"
         },
-        "Attributes" : {
-          "MysqlRootPassword" : {"Ref":"MysqlRootPassword"},
-          "MysqlRootPasswordUbiquitous": "true"
-        },
-        "VolumeConfigurations":[{"MountPoint":"/vol/mysql","NumberOfDisks":1,"Size":10}]
+        "LayerId": {
+          "Ref": "myLayer"
+        }
       }
-    },    
-    "ELBAttachment" : {
-      "Type" : "AWS::OpsWorks::ElasticLoadBalancerAttachment",
-      "Properties" : {
-        "ElasticLoadBalancerName" : { "Ref" : "ELB" },
-        "LayerId" : { "Ref" : "myLayer" }
-      }
-    },	
-    "ELB" : {
+    },
+    "ELB": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties": {
-        "AvailabilityZones": { "Fn::GetAZs" : "" } ,
-        "Listeners": [{
-          "LoadBalancerPort": "80",
-          "InstancePort": "80",
-          "Protocol": "HTTP",
-          "InstanceProtocol": "HTTP"
-        }],
+        "Subnets": [
+          {
+            "Fn::GetAtt": [
+              "NetworkInfo",
+              "PublicSubnet1ID"
+            ]
+          },
+          {
+            "Fn::GetAtt": [
+              "NetworkInfo",
+              "PublicSubnet2ID"
+            ]
+          }
+        ],
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "NetworkInfo",
+              "SGELBAccess"
+            ]
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "HTTP",
+            "InstanceProtocol": "HTTP"
+          }
+        ],
         "HealthCheck": {
           "Target": "HTTP:80/",
           "HealthyThreshold": "2",
@@ -126,40 +321,57 @@
     "myAppInstance1": {
       "Type": "AWS::OpsWorks::Instance",
       "Properties": {
-        "StackId": {"Ref": "myStack"},
-        "LayerIds": [{"Ref": "myLayer"}],
-        "InstanceType": "m1.small"
+        "StackId": {
+          "Ref": "myStack"
+        },
+        "LayerIds": [
+          {
+            "Ref": "myLayer"
+          }
+        ],
+        "InstanceType": "m1.small",
+        "SubnetId": {
+          "Fn::GetAtt": [
+            "NetworkInfo",
+            "PublicSubnet1ID"
+          ]
+        }
       }
-    },    
+    },
     "myAppInstance2": {
       "Type": "AWS::OpsWorks::Instance",
       "Properties": {
-        "StackId": {"Ref": "myStack"},
-        "LayerIds": [{"Ref": "myLayer"}],
-        "InstanceType": "m1.small"
-      }
-    },
-    "myDBInstance": {
-      "Type": "AWS::OpsWorks::Instance",
-      "Properties": {
-        "StackId": {"Ref": "myStack"},
-        "LayerIds": [{"Ref": "DBLayer"}],
-        "InstanceType": "m1.small"
-      }
-    },
-    "myApp" : {
-      "Type" : "AWS::OpsWorks::App",
-      "Properties" : {
-        "StackId" : {"Ref":"myStack"},
-        "Type" : "php",
-        "Name" : {"Ref": "AppName"},
-        "AppSource" : {
-          "Type" : "git",
-          "Url" : "git://github.com/amazonwebservices/opsworks-demo-php-simple-app.git",
-          "Revision" : "version2"
+        "StackId": {
+          "Ref": "myStack"
         },
-        "Attributes" : {
-          "DocumentRoot" : "web"
+        "LayerIds": [
+          {
+            "Ref": "myLayer"
+          }
+        ],
+        "InstanceType": "m1.small",
+        "SubnetId": {
+          "Fn::GetAtt": [
+            "NetworkInfo",
+            "PublicSubnet2ID"
+          ]
+        }
+      }
+    },
+    "myApp": {
+      "Type": "AWS::OpsWorks::App",
+      "Properties": {
+        "StackId": {
+          "Ref": "myStack"
+        },
+        "Type": "php",
+        "Name": {
+          "Ref": "AppName"
+        },
+        "AppSource": {
+          "Type": "archive",
+          "Url": "https://s3.amazonaws.com/Hans-CodePipeline-Bucket-Test/wordpressapp.zip",
+          "Revision": "version2"
         }
       }
     }
