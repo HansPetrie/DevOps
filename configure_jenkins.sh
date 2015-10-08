@@ -14,6 +14,7 @@ java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:808
 java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job MyDemoProject < rendered_templates/config.xml
 java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job DeployLampServer < rendered_templates/deploy_lamp_jenkins_job.xml
 java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job DeployProductionNetwork < rendered_templates/deploy_prod_network_job.xml
+java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job DeployOpsworks < rendered_templates/deploy_opsworks_job.xml
 
 # A restart is inevitable here because the AWS CodePipeline Plugin install doesn't work until Jenkins is restarted
 service jenkins restart
