@@ -1,13 +1,19 @@
 #!/bin/bash
 
 STACKNAME=ProductionNetwork
+REGION="us-east-1"
 
-aws --region us-west-2 cloudformation create-stack --stack-name $STACKNAME --template-body file://teststack.json --capabilities CAPABILITY_IAM 
+aws --region $REGION cloudformation create-stack --stack-name $STACKNAME --parameters ParameterKey=NetworkType,ParameterValue="Stage" --template-body file://teststack.json --capabilities CAPABILITY_IAM 
 
-while [ `aws --region us-west-2 cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].[StackStatus]'` != "CREATE_COMPLETE" ]
+STATUS="UNKNOWN"
+while [ "$STATUS" != "CREATE_COMPLETE" ]
 do
-  sleep 30
-  echo "Stack Building." 
+  STATUS=`aws --region $REGION cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].[StackStatus]'`
+  if [ "$STATUS" == "CREATE_FAILED" ]; then
+	exit 1
+  fi
+  echo "Stack Status: $STATUS"
+  sleep 10 
 done
 
-aws --region us-west-2 cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].Outputs[*].OutputValue'
+aws --region $REGION cloudformation describe-stacks --stack-name $STACKNAME --output text --query 'Stacks[*].Outputs[*].[OutputKey,OutputValue]'

@@ -1,7 +1,92 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Sets up VPC and 2 public and 2 private subnets.  Designed as a child stack.",
+  "Description": "Sets up a Production or Stage VPC with one private and one public subnet in the first two available availability zones in the region (four subnets total).  Also creates basic ELB and RDS security groups.  Use this as the lowest level starting point for other stacks by reading the outputs using a Lambda function.  Review and edit the mappings prior to launch for different IP schemes for region, public, private, production, and stage.  It is designed to allow you to select Production or Stage for your VPC at launch.  Prevents overlapping private subnet addresses by sticking to a single IP addressing schema.",
+  "Mappings": {
+    "CIDRPart1": {
+      "us-east-1": {
+        "Production": "10.0",
+        "Stage": "10.1"
+      },
+      "us-west-1": {
+        "Production": "10.10",
+        "Stage": "10.11"
+      },
+      "us-west-2": {
+        "Production": "10.20",
+        "Stage": "10.21"
+      },
+      "eu-west-1": {
+        "Production": "10.30",
+        "Stage": "10.31"
+      },
+      "eu-central-1": {
+        "Production": "10.40",
+        "Stage": "10.41"
+      },
+      "ap-southeast-1": {
+        "Production": "10.50",
+        "Stage": "10.51"
+      },
+      "ap-southeast-2": {
+        "Production": "10.60",
+        "Stage": "10.61"
+      },
+      "ap-northeast-1": {
+        "Production": "10.70",
+        "Stage": "10.71"
+      },
+      "sa-east-1": {
+        "Production": "10.80",
+        "Stage": "10.81"
+      }
+    },
+    "CIDRPart2": {
+      "Public": {
+        "Primary": "0.0/20",
+        "Secondary": "16.0/20"
+      },
+      "Private": {
+        "Primary": "32.0/20",
+        "Secondary": "48.0/20"
+      }
+    }
+  },
+  "Parameters": {
+    "NetworkType": {
+      "Description": "Production or Stage?",
+      "Type": "String",
+      "AllowedValues": [
+        "Production",
+        "Stage"
+      ],
+      "Default": "Stage"
+    }
+  },
   "Outputs": {
+    "PrimaryAZ": {
+      "Value": {
+        "Fn::Select": [
+          "0",
+          {
+            "Fn::GetAZs": {
+              "Ref": "AWS::Region"
+            }
+          }
+        ]
+      }
+    },
+    "SecondaryAZ": {
+      "Value": {
+        "Fn::Select": [
+          "1",
+          {
+            "Fn::GetAZs": {
+              "Ref": "AWS::Region"
+            }
+          }
+        ]
+      }
+    },
     "VPCID": {
       "Value": {
         "Ref": "VPC"
@@ -42,30 +127,69 @@
     "VPC": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
-        "CidrBlock": "10.1.0.0/16",
+        "CidrBlock": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart1",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                   {
+                    "Ref": "NetworkType"
+                  }
+                ]
+              },
+              "0.0/16"
+            ]
+          ]
+        },
         "EnableDnsSupport": "true",
         "EnableDnsHostnames": "true",
-        "InstanceTenancy": "default",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "ProductionVPC"
-          }
-        ]
+        "InstanceTenancy": "default"
       }
     },
     "PublicSubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": "us-west-2a",
-        "CidrBlock": "10.1.0.0/20",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        },
+        "CidrBlock": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart1",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                   {
+                    "Ref": "NetworkType"
+                  }
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart2",
+                  "Public",
+                  "Primary"
+                ]
+              }
+            ]
+          ]
+        },
         "MapPublicIpOnLaunch": "true",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "SUBPublicWest2a"
-          }
-        ],
         "VpcId": {
           "Ref": "VPC"
         }
@@ -74,15 +198,42 @@
     "PublicSubnet2": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": "us-west-2b",
-        "CidrBlock": "10.1.16.0/20",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        },
+        "CidrBlock": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart1",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  {
+                    "Ref": "NetworkType"
+                  }
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart2",
+                  "Public",
+                  "Secondary"
+                ]
+              }
+            ]
+          ]
+        },
         "MapPublicIpOnLaunch": "true",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "SUBPublicWest2b"
-          }
-        ],
         "VpcId": {
           "Ref": "VPC"
         }
@@ -91,15 +242,42 @@
     "PrivateSubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": "us-west-2a",
-        "CidrBlock": "10.1.32.0/20",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        },
+        "CidrBlock": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart1",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  {
+                    "Ref": "NetworkType"
+                  }
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart2",
+                  "Private",
+                  "Primary"
+                ]
+              }
+            ]
+          ]
+        },
         "MapPublicIpOnLaunch": "false",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "SUBPrivateWest2a"
-          }
-        ],
         "VpcId": {
           "Ref": "VPC"
         }
@@ -108,15 +286,42 @@
     "PrivateSubnet2": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": "us-west-2b",
-        "CidrBlock": "10.1.48.0/20",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        },
+        "CidrBlock": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart1",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  {
+                    "Ref": "NetworkType"
+                  }
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "CIDRPart2",
+                  "Private",
+                  "Secondary"
+                ]
+              }
+            ]
+          ]
+        },
         "MapPublicIpOnLaunch": "false",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "SUBPrivateWest2b"
-          }
-        ],
         "VpcId": {
           "Ref": "VPC"
         }
@@ -141,13 +346,7 @@
       "Properties": {
         "VpcId": {
           "Ref": "VPC"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "ProductionPublicRouteTable"
-          }
-        ]
+        }
       }
     },
     "PublicRoute": {
