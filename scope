@@ -6,10 +6,9 @@ mkdir -p /tmp/scope
 rm -f /tmp/scope/*
 IFS=$'\n' 
 
-regions=$(aws ec2 --region us-east-1 describe-regions --query Regions[*].[RegionName] --output text)
+#regions=$(aws ec2 --region us-east-1 describe-regions --query Regions[*].[RegionName] --output text)
 
-regions="us-east-1
-us-west-2"
+regions="us-east-1"
 
 ec2commands="describe-instances
 describe-availability-zones
