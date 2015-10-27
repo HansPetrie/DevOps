@@ -36,3 +36,7 @@ When the Cloudformation has completed the outputs will show a URL to your Jenkin
 ## Part III Troubleshooting
 
 On the orchestrator check /var/log/cloud-init-output.log for errors.  The scripts are all located in /DevOps/ which is a clone of the git repo.
+
+## Using deploy_stack.sh
+
+./deploy_stack.sh ./cloudformation/rdsmysql.json RDSProduction us-east-1 "ParameterKey=NetworkStackName,ParameterValue=ProductionNetwork"
