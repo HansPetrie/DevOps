@@ -239,7 +239,7 @@
             "PublicSubnet1ID"
           ]
         },
-        "DefaultSshKeyName": "uswest"
+        "DefaultSshKeyName": "default"
       }
     },
     "myLayer": {
@@ -377,3 +377,4 @@
     }
   }
 }
+
