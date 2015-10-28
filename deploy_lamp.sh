@@ -1,0 +1,1 @@
+./deploy_stack.sh cloudformation/lamp.json lampserver us-east-1 "ParameterKey=DBPassword,ParameterValue=password ParameterKey=DBRootPassword,ParameterValue=password ParameterKey=KeyName,ParameterValue=default ParameterKey=DBUser,ParameterValue=username"
