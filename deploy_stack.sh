@@ -27,6 +27,9 @@ do
   if [ "$STATUS" == "CREATE_FAILED" ]; then
 	exit 1
   fi
+  if [ "$STATUS" == "ROLLBACK_COMPLETE" ]; then
+        exit 1
+  fi
   echo "Stack Status: $STATUS"
   sleep 20 
 done
