@@ -13,9 +13,11 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>aws s3 cp s3://<%= @DevopsBucketName %>/test.zip .
-unzip test.zip
-bash test.sh
+      <command>
+rm -rf *
+git clone https://github.com/HansPetrie/DevOps.git
+cd DevOps
+./deploy_lamp.sh
 </command>
     </hudson.tasks.Shell>
   </builders>
