@@ -1,1 +1,1 @@
-./deploy_stack.sh cloudformation/lamp.json lampserver us-east-1 "ParameterKey=KeyName,ParameterValue=default"
+./deploy_stack.sh cloudformation/orchestrator.json devops us-east-1 "ParameterKey=KeyName,ParameterValue=default"
