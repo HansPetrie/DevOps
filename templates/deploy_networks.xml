@@ -14,9 +14,11 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rm -rf *
+rm -rf DevOps
 git clone https://github.com/HansPetrie/DevOps.git
-cd DevOps/cfn_network
-bash test.sh
+cd DevOps
+bash deploy_prod_network.sh 
+bash deploy_stage_network.sh
 </command>
     </hudson.tasks.Shell>
   </builders>
