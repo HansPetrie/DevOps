@@ -16,4 +16,6 @@ aws --region us-east-1 deploy list-deployment-groups --application-name wordpres
 
 aws --region us-east-1 deploy create-deployment-group --application-name wordpress_app --deployment-group-name wordpress_depgroup --deployment-config-name CodeDeployDefault.OneAtATime --ec2-tag-filters Key=Name,Value=CodeDeployDemo,Type=KEY_AND_VALUE --service-role-arn $CodeDeployRoleArn 
 
+#aws s3api put-object-acl --bucket $DevopsBucketName --key wordpressapp.zip --acl public-read
+
 #aws --region us-east-1 deploy create-deployment --application-name wordpress_app --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name wordpress_depgroup --s3-location bucket=$DevopsBucketName,bundleType=zip,key=wordpressapp.zip

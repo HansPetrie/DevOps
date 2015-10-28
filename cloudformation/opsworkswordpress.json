@@ -289,6 +289,14 @@
         "AutoAssignElasticIps": "false",
         "AutoAssignPublicIps": "true",
         "Name": "MyPHPApp",
+        "CustomSecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "NetworkInfo",
+              "SGRDSAccess"
+            ]
+          }
+        ],
         "CustomRecipes": {
           "Configure": [
             "phpapp::appsetup"
@@ -403,9 +411,8 @@
           "Ref": "AppName"
         },
         "AppSource": {
-          "Type": "archive",
-          "Url": "https://s3.amazonaws.com/Hans-CodePipeline-Bucket-Test/wordpressapp.zip",
-          "Revision": "version2"
+          "Type": "git",
+          "Url": "https://github.com/HansPetrie/app.git"
         }
       }
     }
