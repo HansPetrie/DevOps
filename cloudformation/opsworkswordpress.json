@@ -2,7 +2,7 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
     "NetworkStackName": {
-      "Default": "ProductionNetwork",
+      "Default": "networkstage",
       "Description": "The name of the CFN stack to use as the VPC Network.  Note: this stack must already be deployed.",
       "Type": "String",
       "MinLength": "1",
@@ -10,10 +10,14 @@
       "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
       "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
     },
-    "DBHostname": {
-      "Default": "rrhkxx551ycwz0.culovgr4qwyc.us-west-2.rds.amazonaws.com",
-      "Description": "The name of the database host or RDS endpoint.  Must already be deployed.",
-      "Type": "String"
+     "RDSStackName": {
+      "Default": "RDSProduction",
+      "Description": "The name of the CFN stack to use as the VPC Network.  Note: this stack must already be deployed.",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
     },
     "ServiceRole": {
       "Default": "aws-opsworks-service-role",
@@ -100,6 +104,20 @@
         },
         "StackName": {
           "Ref": "NetworkStackName"
+        }
+      }
+    },
+    "RDSInfo": {
+      "Type": "Custom::RDSInfo",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "LookupStackOutputs",
+            "Arn"
+          ]
+        },
+        "StackName": {
+          "Ref": "RDSStackName"
         }
       }
     },
@@ -251,7 +269,10 @@
             "db_user": "root",
             "db_password": "password",
             "db_hostname": {
-              "Ref": "DBHostname"
+              "Fn::GetAtt": [
+                "RDSInfo",
+                "DBEndpoint"
+              ]
             },
             "site_url": {
               "Fn::GetAtt": [
