@@ -1,0 +1,72 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "DockerApplication": {
+      "Type": "AWS::ElasticBeanstalk::Application",
+      "Properties": {
+        "Description": "AWS Elastic Beanstalk Sample Application"
+      }
+    },
+    "DockerApplicationVersion": {
+      "Type": "AWS::ElasticBeanstalk::ApplicationVersion",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "DockerApplication"
+        },
+        "Description": "AWS ElasticBeanstalk Sample Application Version",
+        "SourceBundle": {
+          "S3Bucket": "publicrandomstuff",
+          "S3Key": "Dockerfile"
+        }
+      }
+    },
+    "DockerConfigurationTemplate": {
+      "Type": "AWS::ElasticBeanstalk::ConfigurationTemplate",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "DockerApplication"
+        },
+        "Description": "AWS ElasticBeanstalk Sample Configuration Template",
+        "OptionSettings": [
+          {
+            "Namespace": "aws:autoscaling:asg",
+            "OptionName": "MinSize",
+            "Value": "2"
+          },
+          {
+            "Namespace": "aws:autoscaling:asg",
+            "OptionName": "MaxSize",
+            "Value": "6"
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:environment",
+            "OptionName": "EnvironmentType",
+            "Value": "LoadBalanced"
+          }
+        ],
+        "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.2 running Docker 1.7.1"
+      }
+    },
+    "DockerEnvironment": {
+      "Type": "AWS::ElasticBeanstalk::Environment",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "DockerApplication"
+        },
+        "Description": "AWS ElasticBeanstalk Docker Environment",
+        "TemplateName": {
+          "Ref": "DockerConfigurationTemplate"
+        },
+        "VersionLabel": {
+          "Ref": "DockerApplicationVersion"
+        },
+        "SolutionStackName": "64bit Amazon Linux 2015.03 v2.0.2 running Docker 1.7.1",
+        "Tier": {
+          "Version": " ",
+          "Type": "Standard",
+          "Name": "WebServer"
+        }
+      }
+    }
+  }
+}
