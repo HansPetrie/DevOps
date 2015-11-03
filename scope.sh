@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -x 
+#!/bin/bash -e
 
 mkdir -p /tmp/scope
 rm -f /tmp/scope/*
@@ -10,30 +8,33 @@ IFS=$'\n'
 
 regions="us-east-1"
 
-ec2commands="describe-instances
-describe-availability-zones
-describe-security-groups
-describe-vpcs
-describe-subnets
-describe-route-tables"
-
-ebcommands="describe-environments
-describe-applications
-describe-configuration-options"
+commands="ec2 describe-account-attributes
+ec2 describe-addresses
+ec2 describe-availability-zones
+ec2 describe-instances
+ec2 describe-internet-gateways
+ec2 describe-key-pairs
+ec2 describe-network-acls
+ec2 describe-network-interfaces
+ec2 describe-placement-groups
+ec2 describe-reserved-instances
+ec2 describe-route-tables
+ec2 describe-security-groups
+ec2 describe-subnets
+ec2 describe-tags
+ec2 describe-volumes
+ec2 describe-vpcs
+elb describe-load-balancers
+rds describe-db-instances
+elasticbeanstalk describe-environments
+elasticbeanstalk describe-applications
+elasticbeanstalk describe-configuration-options
+"
 
 for region in $regions; do
-  for command in $ec2commands; do
-    aws ec2 --region $region $command > /tmp/scope/ec2-$region-$command.json
-  done 
-  for command in $ebcommands; do
-    aws elasticbeanstalk --region $region $command > /tmp/scope/eb-$region-$command.json 
-  done
-
-  environments=$(aws --region $region elasticbeanstalk describe-environments --query Environments[*].[EnvironmentName] --output text)
-  for environment in $environments; do
-    applications=$(aws --region $region elasticbeanstalk describe-environments --environment-name $environment --query Environments[*].[ApplicationName] --output text)
-    for application in $applications; do
-      aws --region $region elasticbeanstalk describe-configuration-settings --application-name $application --environment-name $environment > /tmp/scope/eb-$region-configuration-settings-$environment-$application
-    done
+  for command in $commands; do
+    filename=$(echo $command | sed 's/ /-/g' )
+    echo "aws --region $region $command > /tmp/scope/$region-$filename"
+    bash -c "aws --output json --region $region $command > /tmp/scope/$region-$filename"
   done
 done
