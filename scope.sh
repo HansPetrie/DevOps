@@ -4,9 +4,16 @@ mkdir -p /tmp/scope
 rm -f /tmp/scope/*
 IFS=$'\n' 
 
+#For all regions use this
 #regions=$(aws ec2 --region us-east-1 describe-regions --query Regions[*].[RegionName] --output text)
 
-regions="us-east-1"
+#To hard code a single region
+#regions="us-east-1"
+
+#To use several regions
+regions="us-east-1
+us-west-2
+us-west-1"
 
 commands="ec2 describe-account-attributes
 ec2 describe-addresses
@@ -34,7 +41,8 @@ elasticbeanstalk describe-configuration-options
 for region in $regions; do
   for command in $commands; do
     filename=$(echo $command | sed 's/ /-/g' )
-    echo "aws --region $region $command > /tmp/scope/$region-$filename"
+    set -x
     bash -c "aws --output json --region $region $command > /tmp/scope/$region-$filename"
+    set +x
   done
 done
