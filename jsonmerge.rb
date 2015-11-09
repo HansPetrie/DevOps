@@ -15,6 +15,7 @@ rds_hash = JSON.parse(File.read("#{@filepath}/#{@region}-rds-describe-db-instanc
 
 instance_array = Array.new
 instance_hash = Hash.new
+output_hash = Hash.new
 
 reservation_hash['Reservations'].each do |reservation|
   reservation['Instances'].each do |instance|
@@ -23,9 +24,9 @@ reservation_hash['Reservations'].each do |reservation|
 end
 
 instance_hash=instance_hash.merge({"Instances" => instance_array})
+vpc_array = Array.new
 
 vpc_hash['Vpcs'].each do |vpc|
-  puts "---------------------------------------"
   elbs_in_vpc = elb_hash['LoadBalancerDescriptions'].select { |key, hash| key["VPCId"] == vpc['VpcId'] } 
   merged = vpc.merge({:ELB => elbs_in_vpc})
   puts vpc["Vpc_Id"]
@@ -44,5 +45,9 @@ vpc_hash['Vpcs'].each do |vpc|
     subnet_array.push(subnet_merged)
   end
   merged = merged.merge({:Subnets => subnet_array})
-  puts merged.to_yaml
+  #puts merged.to_yaml
+  vpc_array.push(merged)
 end
+
+output_hash = output_hash.merge({:VPC => vpc_array})
+puts output_hash.to_json
