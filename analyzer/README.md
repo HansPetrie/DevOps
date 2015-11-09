@@ -1,3 +1,7 @@
+# AWS Account Analzyer
+
+There are 3 scripts here.  The first one gathers object metadata in json format from an account.  The second takes the raw output files and colates them into a single merged json object.  The third prints salient information in a nicely formatted way.
+
 ## scope.sh
 Run this on an instance that has aws tools installed and has proper read credentails.  Everything is hard coded in the script.  Edit the script and change the path for the scratch directory and the regions.  Also edit the commands you want to iterate.
 
@@ -18,7 +22,6 @@ Usage:
 * redirect the output to a file as shown.  This file will be the merge of all the json objects in /tmp/scope for the region specified.
 
 **Notes:** It is possible to edit this script and have it output yaml instead of json.  Examples are shown at the end - simply change the last puts to
-#To print in yaml#To print in yaml
 ```
 #Change
 puts output_hash.to_json
@@ -31,4 +34,4 @@ Usage:
 ```
 ./newanalyzer.rb /tmp/mergedfile.json
 ```
-Gives a nicely formatted output.  This is relatively easy to edit and adjust as required for different outputs.
+Gives a nicely formatted output of the /tmp/mergedfile.json generated with jsonmerge.rb.  This is relatively easy to edit and adjust as required for different outputs.
