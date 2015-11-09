@@ -3,8 +3,8 @@
 require 'json'
 require 'yaml'
 
-@region="us-east-1"
-@filepath="/tmp/scope"
+@region=ARGV[0]
+@filepath=ARGV[1]
 
 vpc_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-vpcs"))
 subnet_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-subnets"))
@@ -15,7 +15,6 @@ rds_hash = JSON.parse(File.read("#{@filepath}/#{@region}-rds-describe-db-instanc
 
 instance_array = Array.new
 instance_hash = Hash.new
-output_hash = Hash.new
 
 reservation_hash['Reservations'].each do |reservation|
   reservation['Instances'].each do |instance|
@@ -45,9 +44,13 @@ vpc_hash['Vpcs'].each do |vpc|
     subnet_array.push(subnet_merged)
   end
   merged = merged.merge({:Subnets => subnet_array})
-  #puts merged.to_yaml
   vpc_array.push(merged)
 end
 
+#Put everything in one big hash and output
+output_hash = Hash.new
 output_hash = output_hash.merge({:VPC => vpc_array})
 puts output_hash.to_json
+
+#To print in yaml
+#puts output_hash.to_yaml
