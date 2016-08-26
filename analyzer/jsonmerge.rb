@@ -3,15 +3,16 @@
 require 'json'
 require 'yaml'
 
-@region=ARGV[0]
-@filepath=ARGV[1]
+@profile=ARGV[0]
+@region=ARGV[1]
+@filepath=ARGV[2]
 
-vpc_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-vpcs"))
-subnet_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-subnets"))
-reservation_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-instances"))
-security_group_hash = JSON.parse(File.read("#{@filepath}/#{@region}-ec2-describe-security-groups"))
-elb_hash = JSON.parse(File.read("#{@filepath}/#{@region}-elb-describe-load-balancers"))
-rds_hash = JSON.parse(File.read("#{@filepath}/#{@region}-rds-describe-db-instances"))
+vpc_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-ec2-describe-vpcs"))
+subnet_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-ec2-describe-subnets"))
+reservation_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-ec2-describe-instances"))
+security_group_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-ec2-describe-security-groups"))
+elb_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-elb-describe-load-balancers"))
+rds_hash = JSON.parse(File.read("#{@filepath}/#{@profile}-#{@region}-rds-describe-db-instances"))
 
 instance_array = Array.new
 instance_hash = Hash.new

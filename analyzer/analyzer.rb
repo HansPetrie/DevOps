@@ -11,7 +11,7 @@ input_hash['VPC'].each do |vpc|
   puts "#{vpc['VpcId']} #{vpc['CidrBlock']}"
   if vpc['Tags']
     vpc['Tags'].each do |vpc_tags|
-      puts "#{vpc_tags['Key']} #{vpc_tags['Value']}"
+      puts "#{vpc_tags['Key']}:#{vpc_tags['Value']}"
     end
   end
   vpc['ELB'].each do |elb|
@@ -21,14 +21,21 @@ input_hash['VPC'].each do |vpc|
     puts "  RDS #{rds['DBInstanceIdentifier']}  #{rds['DBInstanceClass']}  #{rds['Engine']}"
   end
   vpc['Subnets'].each do |subnet|
-    puts "  #{subnet['SubnetId']} #{subnet['CidrBlock']} #{subnet['AvailabilityZone']}"
+    puts "------------------"  
+    puts "--#{subnet['SubnetId']} #{subnet['CidrBlock']} #{subnet['AvailabilityZone']}"
     subnet['Instances'].each do |instance|
-      printf "      %-9.9s %-12.12s %-12.12s %-10.10s",    instance['InstanceId'], instance['PrivateIpAddress'], instance['PublicIpAddress'], instance['InstanceType']
-      if instance['Tags'] then
-        instance['Tags'].each do |instance_tags|
-          print " #{instance_tags['Key']} #{instance_tags['Value']}"
+	if instance['Tags'] then
+          instance['Tags'].each do |instance_tags|
+            print " #{instance_tags['Key']}:#{instance_tags['Value']}"
+          end
         end
+        print "\n"
+      	printf "      %-9.9s %-12.12s %-12.12s %-10.10s",    instance['InstanceId'], instance['PrivateIpAddress'], instance['PublicIpAddress'], instance['InstanceType']
+      	print  "SGs: "
+      	instance["SecurityGroups"].each do |security_group|
+	  print"  #{security_group['GroupName']}"
       end
+      print "\n"
       print "\n" 
     end
   end

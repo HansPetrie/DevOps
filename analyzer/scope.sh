@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-mkdir -p /tmp/scope
-rm -f /tmp/scope/*
+rm -rf awsreport
+mkdir -p awsreport 
 IFS=$'\n' 
 
 #For all regions use this
@@ -10,9 +10,13 @@ IFS=$'\n'
 #To hard code a single region
 #regions="us-east-1"
 
+#To use several profiles
+profiles="devops
+production
+qa"
+
 #To use several regions
 regions="us-east-1
-us-west-2
 us-west-1"
 
 commands="ec2 describe-account-attributes
@@ -40,9 +44,11 @@ elasticbeanstalk describe-configuration-options
 
 for region in $regions; do
   for command in $commands; do
-    filename=$(echo $command | sed 's/ /-/g' )
-    set -x
-    bash -c "aws --output json --region $region $command > /tmp/scope/$region-$filename"
-    set +x
+    for profile in $profiles; do
+      filename=$(echo $command | sed 's/ /-/g' )
+      set -x
+      bash -c "aws --profile $profile --output json --region $region $command > awsreport/$profile-$region-$filename"
+      set +x
+    done
   done
 done
