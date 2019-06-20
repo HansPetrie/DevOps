@@ -30,7 +30,7 @@
   "Mappings" : {
     "RegionMap" : {
       "us-east-1" : { "64": "ami-0d4cfd66"},
-      "us-west-2" : { "64": "ami-9ff7e8af"}
+      "us-west-2" : { "64": "ami-0e9a26a04cf77de3b"}
     }
   },
   "Resources": {
